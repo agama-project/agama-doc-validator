@@ -85,23 +85,23 @@ trigger a syntax error.
 </screen>
 ```
 
-## 4. Hiding outer parts of the JSON snippet with `<remark>`
+## 4. Hiding outer parts of the JSON snippet with `role="hide"`
 
 Sometimes you might want to provide a fully valid JSON object for the validator, but hide the outer
 structure (like parent keys or objects) from the reader so they can focus on a specific inner
-property. You can achieve this by wrapping the hidden parts in a `<remark>` DocBook tag.
+property. You can achieve this by wrapping the hidden parts in a `<phrase role="hide">` DocBook tag.
 
-The validator automatically strips all XML tags (including `<remark>`) found inside a `<screen>`
+The validator automatically strips all XML tags (including `<phrase>`) found inside a `<screen>`
 block before validation, but it **keeps the text content** inside them. However, in the rendered
-HTML or PDF documentation, the contents of the `<remark>` tag are not displayed.
+HTML or PDF documentation, the contents with the `role="hide"` attributes are not displayed.
 
 This documentation snippet
 
 ```xml
 <screen language="agama-json">
-<remark>"storage": { "drives": [</remark>
+<phrase role="hide">"storage": { "drives": [</phrase>
 { "search": "/dev/sda" }
-<remark>]}</remark>
+<phrase role="hide">]}</phrase>
 </screen>
 ```
 
