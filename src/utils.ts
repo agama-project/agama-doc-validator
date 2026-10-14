@@ -44,9 +44,11 @@ export function findXmlFiles(dirOrFile: string): string[] {
 // map some special names to Git branches
 const ALIASES: Record<string, string> = {
   latest:
-    "https://raw.githubusercontent.com/agama-project/agama/refs/heads/master/rust/share/profile.schema.json",
+    "https://raw.githubusercontent.com/agama-project/agama-openapi/refs/heads/main/nightly/schemas/config.schema.json",
   "SLE-16.0":
-    "https://raw.githubusercontent.com/agama-project/agama/refs/heads/SLE-16/rust/agama-lib/share/profile.schema.json"
+    "https://raw.githubusercontent.com/agama-project/agama/refs/heads/SLE-16/rust/agama-lib/share/profile.schema.json",
+  "SLE-16.1":
+    "https://raw.githubusercontent.com/agama-project/agama/refs/heads/SLE-16.1/rust/share/profile.schema.json"
 };
 
 /**
