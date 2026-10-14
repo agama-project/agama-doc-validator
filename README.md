@@ -76,6 +76,7 @@ The tool comes with predefined aliases for quick validation against official Aga
 
 - `latest` : Fetches the latest Agama profile schema from the GitHub master branch. This is for the
   currently developed product release.
+- `SLE-16.1` : Fetches the Agama profile for the SLE-16.1 and openSUSE Leap 16.1 product
 - `SLE-16.0` : Fetches the Agama profile for the SLE-16.0 and openSUSE Leap 16.0 product
 
 Other aliases are mapped to the Agama GitHub repository branches.
