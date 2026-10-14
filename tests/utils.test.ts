@@ -107,7 +107,7 @@ describe("Utils", () => {
 
       const schemas = await loadSchema("latest");
       assert.strictEqual(schemas.length, 1);
-      assert.match(schemas[0].uri, /master.*profile\.schema\.json/);
+      assert.match(schemas[0].uri, /nightly.*config\.schema\.json/);
     });
 
     it("should throw an error on fetch failure", async () => {
