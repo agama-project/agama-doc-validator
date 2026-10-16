@@ -74,8 +74,8 @@ The bundled script can be executed directly.
 
 The tool comes with predefined aliases for quick validation against official Agama schemas:
 
-- `latest` : Fetches the latest Agama profile schema from the GitHub master branch. This is for the
-  currently developed product release.
+- `latest` : Fetches the latest Agama profile schema from the Agama OpenAPI repository. This is for
+  the currently developed product release (Agama git master branch).
 - `SLE-16.1` : Fetches the Agama profile for the SLE-16.1 and openSUSE Leap 16.1 product
 - `SLE-16.0` : Fetches the Agama profile for the SLE-16.0 and openSUSE Leap 16.0 product
 
@@ -124,8 +124,8 @@ See the [action.yml](action.yml) file for more details.
 After doing any change in the code or after updating the dependencies you need to rebuild the
 content of the `dist/` directory, simply run `npm run package`.
 
-To ensure you do not forget doing this the `npm install` call installs a Git pre-push hook which
-checks that everything is OK.
+To ensure you do not forget doing this the `npm install`/`npm ci` calls install a Git pre-push hook
+which checks that everything is OK.
 
 ### Links
 
