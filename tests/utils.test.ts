@@ -97,6 +97,56 @@ describe("Utils", () => {
       assert.strictEqual(schemas[1].uri, "http://example.com/sub.json");
     });
 
+    it("should load each referenced local schema only once", async () => {
+      mock.method(fs, "existsSync", () => true);
+      const readFile = mock.method(fs, "readFileSync", (p: string) => {
+        if (p.endsWith("main.json")) {
+          return JSON.stringify({
+            type: "object",
+            properties: {
+              a: { $ref: "a.json" },
+              b: { $ref: "b.json" },
+              c: { $ref: "shared.json" }
+            }
+          });
+        } else if (p.endsWith("a.json") || p.endsWith("b.json")) {
+          return JSON.stringify({ $ref: "shared.json" });
+        } else if (p.endsWith("shared.json")) {
+          // circular reference back to the main schema
+          return JSON.stringify({ properties: { loop: { $ref: "main.json" } } });
+        }
+        return "{}";
+      });
+
+      const schemas = await loadSchema("main.json");
+      const uris = schemas.map((s) => s.uri);
+      assert.strictEqual(uris.length, 4);
+      assert.strictEqual(new Set(uris).size, 4);
+      assert.strictEqual(readFile.mock.callCount(), 4);
+    });
+
+    it("should fetch each referenced remote schema only once", async () => {
+      const fetchMock = mock.method(globalThis, "fetch", async (url: string | URL | Request) => {
+        const urlStr = url.toString();
+        let json: object;
+        if (urlStr.endsWith("main.json")) {
+          json = { properties: { a: { $ref: "a.json" }, b: { $ref: "a.json" } } };
+        } else if (urlStr.endsWith("a.json")) {
+          json = { properties: { loop: { $ref: "main.json" } } };
+        } else {
+          throw new Error(`Unexpected URL: ${urlStr}`);
+        }
+        return { ok: true, json: async () => json } as Response;
+      });
+
+      const schemas = await loadSchema("http://example.com/main.json");
+      assert.deepStrictEqual(
+        schemas.map((s) => s.uri),
+        ["http://example.com/main.json", "http://example.com/a.json"]
+      );
+      assert.strictEqual(fetchMock.mock.callCount(), 2);
+    });
+
     it("should fetch a schema using an alias", async () => {
       mock.method(
         globalThis,

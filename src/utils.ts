@@ -79,10 +79,15 @@ export async function loadSchema(schemaRef: string): Promise<SchemaDefinition[]>
  * Loads a JSON schema from a local file and recursively fetches referenced schemas.
  *
  * @param {string} filePath - The local file path to the schema.
+ * @param {Set<string>} visited - Already loaded schema paths, shared across recursive calls.
  * @returns {Promise<SchemaDefinition[]>} A promise resolving to an array of schema definitions.
  */
-async function loadLocalSchema(filePath: string): Promise<SchemaDefinition[]> {
+async function loadLocalSchema(
+  filePath: string,
+  visited: Set<string> = new Set()
+): Promise<SchemaDefinition[]> {
   const absolutePath = path.resolve(filePath);
+  visited.add(absolutePath);
   const content = fs.readFileSync(absolutePath, "utf-8");
   const json = JSON.parse(content);
   delete json.$schema;
@@ -107,8 +112,11 @@ async function loadLocalSchema(filePath: string): Promise<SchemaDefinition[]> {
           const dir = path.dirname(absolutePath);
           const referencedPath = path.resolve(dir, value);
 
-          const nestedData = await loadLocalSchema(referencedPath);
-          result.push(...nestedData);
+          // skip schemas already loaded (duplicate or circular references)
+          if (!visited.has(referencedPath)) {
+            const nestedData = await loadLocalSchema(referencedPath, visited);
+            result.push(...nestedData);
+          }
         }
         await findReferences(value);
       }
@@ -123,9 +131,14 @@ async function loadLocalSchema(filePath: string): Promise<SchemaDefinition[]> {
  * Fetches a JSON schema from a URL and recursively fetches referenced schemas.
  *
  * @param {string} url - The URL of the schema to download.
+ * @param {Set<string>} visited - Already fetched schema URLs, shared across recursive calls.
  * @returns {Promise<SchemaDefinition[]>} A promise resolving to an array of schema definitions.
  */
-async function fetchSchema(url: string): Promise<SchemaDefinition[]> {
+async function fetchSchema(
+  url: string,
+  visited: Set<string> = new Set()
+): Promise<SchemaDefinition[]> {
+  visited.add(url);
   console.log(pc.gray(`Downloading ${url}...`));
 
   const response = await fetch(url);
@@ -157,9 +170,12 @@ async function fetchSchema(url: string): Promise<SchemaDefinition[]> {
           pathParts[pathParts.length - 1] = value;
           schemaUrl.pathname = pathParts.join("/");
 
-          const nestedData = await fetchSchema(schemaUrl.toString());
-
-          result.push(...nestedData);
+          // skip schemas already fetched (duplicate or circular references)
+          const nestedUrl = schemaUrl.toString();
+          if (!visited.has(nestedUrl)) {
+            const nestedData = await fetchSchema(nestedUrl, visited);
+            result.push(...nestedData);
+          }
         }
         await findReferences(value);
       }
