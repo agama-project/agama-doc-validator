@@ -31,6 +31,15 @@ describe("Heuristics Engine", () => {
     assert.deepStrictEqual(result.parsed, { name: "agama" });
   });
 
+  it("should not treat single-quoted fragments as JSON", () => {
+    assert.deepStrictEqual(analyzeSnippet("'name': 'agama'"), { isJson: false });
+
+    // when forced, parse as-is without wrapping in {}
+    const result = analyzeSnippet("'name': 'agama'", true);
+    assert.strictEqual(result.isJson, true);
+    assert.ok(result.error);
+  });
+
   it("should parse valid JSON objects and arrays", () => {
     const objResult = analyzeSnippet('{"product": "SLES"}');
     assert.strictEqual(objResult.isJson, true);

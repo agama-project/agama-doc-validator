@@ -54,8 +54,8 @@ export function analyzeSnippet(text: string, forceJson: boolean = false): Heuris
 
   const firstChar = trimmed[0];
 
-  // Check for JSON fragment heuristic (e.g., "key": "value" or 'key': { ... })
-  if (firstChar === '"' || firstChar === "'") {
+  // Check for JSON fragment heuristic (e.g., "key": "value" or "key": { ... }),
+  if (firstChar === '"') {
     if (trimmed.includes(":")) {
       // Wrap in {} to form a valid JSON object
       trimmed = `{ ${trimmed} }`;
