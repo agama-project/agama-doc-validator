@@ -1,7 +1,7 @@
 # Agama Doc Validator
 
-[![Continuous Integration](https://github.com/lslezak/agama-doc-validator/actions/workflows/ci.yml/badge.svg)](https://github.com/lslezak/agama-doc-validator/actions/workflows/ci.yml)
-[![Check Transpiled JavaScript](https://github.com/lslezak/agama-doc-validator/actions/workflows/check-dist.yml/badge.svg)](https://github.com/lslezak/agama-doc-validator/actions/workflows/check-dist.yml)
+[![Continuous Integration](https://github.com/agama-project/agama-doc-validator/actions/workflows/ci.yml/badge.svg)](https://github.com/agama-project/agama-doc-validator/actions/workflows/ci.yml)
+[![Check Transpiled JavaScript](https://github.com/agama-project/agama-doc-validator/actions/workflows/check-dist.yml/badge.svg)](https://github.com/agama-project/agama-doc-validator/actions/workflows/check-dist.yml)
 
 The **Agama Doc Validator** is a CLI tool designed to scan DocBook XML files, automatically identify
 JSON snippets within `<screen>` tags, and validate them against an Agama Profile JSON Schema.
@@ -106,11 +106,11 @@ jobs:
 
       # this validates all <screen language="agama-json"> blocks in the documents
       - name: Run Agama JSON Validator
-        uses: lslezak/agama-doc-validator@v1
+        uses: agama-project/agama-doc-validator@v1
 
       # this validates all <screen> blocks without "language=" attribute
       - name: Run Agama JSON Validator
-        uses: lslezak/agama-doc-validator@v1
+        uses: agama-project/agama-doc-validator@v1
         with:
           mode: missing
 ```
