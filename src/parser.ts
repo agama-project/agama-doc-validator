@@ -6,6 +6,9 @@ import fs from "node:fs";
 import sax from "sax";
 import pc from "picocolors";
 
+// DocBook 5 XML namespace
+const DOCBOOK_NS = "http://docbook.org/ns/docbook";
+
 /**
  * Represents an extracted snippet from a `<screen>` tag.
  */
@@ -28,18 +31,23 @@ export function extractScreenSnippets(filePath: string, all: boolean = false): S
   const content = fs.readFileSync(filePath, "utf-8");
 
   // Using non-strict mode to avoid crashing on DocBook custom entities (e.g. &prompt.sudo;)
-  const parser = sax.parser(false, { lowercase: true });
+  const parser = sax.parser(false, { lowercase: true, xmlns: true });
   let inScreen = false;
   let currentText = "";
   let startLine = 0;
   let currentLanguage: string | undefined = undefined;
+  // the qualified name of the opened <screen> tag (might include a namespace prefix)
+  let screenTag = "";
 
   parser.onopentag = (node) => {
-    if (node.name === "screen") {
-      const lang = (node.attributes as any)?.language;
+    // with the "xmlns: true" option all tags are qualified, accept the DocBook namespace
+    // and also the namespace-less files
+    if ("uri" in node && node.local === "screen" && (node.uri === DOCBOOK_NS || node.uri === "")) {
+      const lang = node.attributes.language?.value;
       const isAgamaJson = lang === "agama-json";
       if (all || isAgamaJson) {
         inScreen = true;
+        screenTag = node.name;
         currentText = "";
         startLine = parser.line;
         currentLanguage = lang;
@@ -56,7 +64,7 @@ export function extractScreenSnippets(filePath: string, all: boolean = false): S
   };
 
   parser.onclosetag = (name) => {
-    if (name === "screen" && inScreen) {
+    if (inScreen && name === screenTag) {
       inScreen = false;
 
       snippets.push({
