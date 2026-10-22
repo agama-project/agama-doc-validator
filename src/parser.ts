@@ -40,8 +40,8 @@ export function extractScreenSnippets(filePath: string, all: boolean = false): S
   let screenTag = "";
 
   parser.onopentag = (node) => {
-    // with the "xmlns: true" option all tags are qualified, accept the DocBook namespace
-    // and also the namespace-less files
+    // with the "xmlns: true" option all tags are qualified, accept the DocBook 5 namespace
+    // and also the namespace-less files (DocBook 4)
     if ("uri" in node && node.local === "screen" && (node.uri === DOCBOOK_NS || node.uri === "")) {
       const lang = node.attributes.language?.value;
       const isAgamaJson = lang === "agama-json";
