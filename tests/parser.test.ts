@@ -60,6 +60,44 @@ describe("Parser", () => {
     assert.strictEqual(snippets[2].language, undefined);
   });
 
+  it("should extract snippets from the DocBook namespace", () => {
+    mock.method(
+      fs,
+      "readFileSync",
+      () => `
+      <book xmlns="http://docbook.org/ns/docbook" xmlns:db="http://docbook.org/ns/docbook">
+        <screen language="agama-json">{"default": "ns"}</screen>
+        <db:screen language="agama-json">{"prefixed": "ns"}</db:screen>
+      </book>
+    `
+    );
+
+    const snippets = extractScreenSnippets("test.xml");
+    assert.strictEqual(snippets.length, 2);
+    assert.strictEqual(snippets[0].text, '{"default": "ns"}');
+    assert.strictEqual(snippets[0].language, "agama-json");
+    assert.strictEqual(snippets[1].text, '{"prefixed": "ns"}');
+    assert.strictEqual(snippets[1].language, "agama-json");
+  });
+
+  it("should ignore <screen> tags from other namespaces", () => {
+    mock.method(
+      fs,
+      "readFileSync",
+      () => `
+      <book xmlns="http://docbook.org/ns/docbook" xmlns:x="http://example.com/other">
+        <x:screen language="agama-json">{"other": "ns"}</x:screen>
+        <para xmlns="http://example.com/other">
+          <screen language="agama-json">{"other": "default"}</screen>
+        </para>
+      </book>
+    `
+    );
+
+    const snippets = extractScreenSnippets("test.xml", true);
+    assert.strictEqual(snippets.length, 0);
+  });
+
   it("should return an empty array if no screens are found", () => {
     mock.method(fs, "readFileSync", () => `<book><para>No screens here!</para></book>`);
 

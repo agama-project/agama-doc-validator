@@ -1,7 +1,7 @@
 {
   "name": "agama-doc-validator",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Validator for Agama JSON profiles included in the official SUSE documentation",
   "bin": {
     "agama-doc-validator": "./src/agama-doc-validator.ts"
